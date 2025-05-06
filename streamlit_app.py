@@ -1,56 +1,78 @@
 import streamlit as st
-from openai import OpenAI
+from assistant import get_assistant_response, render_mixed_content
 
-# Show title and description.
-st.title("💬 Chatbot")
-st.write(
-    "This is a simple chatbot that uses OpenAI's GPT-3.5 model to generate responses. "
-    "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
-    "You can also learn how to build this app step by step by [following our tutorial](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)."
-)
+st.set_page_config(page_title="Rear_Earth_Cluster Chatbot", page_icon="💬")
+'''稀土团簇合成数据机器人'''
+st.markdown("""
+    <style>
+        .chat-container {
+            max-width: 700px;
+            margin: auto;
+        }
+        .chat-bubble {
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+            max-width: 80%;
+        }
+        .user {
+            background-color: #0078ff;
+            color: white;
+            align-self: flex-end;
+        }
+        .assistant {
+            background-color: #f1f1f1;
+            color: black;
+            align-self: flex-start;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# Ask user for their OpenAI API key via `st.text_input`.
-# Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
-# via `st.secrets`, see https://docs.streamlit.io/develop/concepts/connections/secrets-management
-openai_api_key = st.text_input("OpenAI API Key", type="password")
-if not openai_api_key:
-    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
-else:
+# 聊天记录（会话状态）
+if "messages" not in st.session_state:
+      st.session_state.messages = [{"role": "assistant", "content": "你好！我是稀土团簇合成小助手！"}]
+st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
 
-    # Create an OpenAI client.
-    client = OpenAI(api_key=openai_api_key)
+# 显示聊天记录
+for message in st.session_state.messages:
+    role_class = "user" if message["role"] == "user" else "assistant"
+    st.markdown(f"""
+        <div class='chat-bubble {role_class}'>
+            {message["content"]}
+        </div>
+    """, unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
-    # Create a session state variable to store the chat messages. This ensures that the
-    # messages persist across reruns.
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+# 用户输入框和发送按钮
+with st.form("chat_form_1", clear_on_submit=True):
+    user_input = st.text_input("请输入消息：", key="user_input_1")
+    submit_button_1 = st.form_submit_button("发送")
+if submit_button_1 and user_input:
+    # 记录用户消息
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    # 显示用户消息
+    st.markdown(f"""
+        <div class='chat-bubble user'>
+            {user_input}
+        </div>
+    """, unsafe_allow_html=True)
+    
+    try:
+        content = get_assistant_response(user_input)
+        #content = response.choices[0].message.content
+        #st.markdown(f"""
+            #<div class='chat-bubble assistant' style="font-size: 16px; padding: 10px; border-radius: 10px; background-color: #f0f2f6;">
+                #{content}
+            #</div>
+        #""", unsafe_allow_html=True)
+        render_mixed_content(content) #格式化输出
+        st.session_state.messages.append({"role": "assistant", "content": content})  
+    except Exception as e:
+        st.error(f"发生错误: {e}")
 
-    # Display the existing chat messages via `st.chat_message`.
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    # Create a chat input field to allow the user to enter a message. This will display
-    # automatically at the bottom of the page.
-    if prompt := st.chat_input("What is up?"):
-
-        # Store and display the current prompt.
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-
-        # Generate a response using the OpenAI API.
-        stream = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-            stream=True,
-        )
-
-        # Stream the response to the chat using `st.write_stream`, then store it in 
-        # session state.
-        with st.chat_message("assistant"):
-            response = st.write_stream(stream)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+    st.markdown(f"""
+    <div class='chat-bubble assistant' style="font-size: 16px; padding: 10px; border-radius: 10px; background-color: #f0f2f6;">
+        输入要查看结构的ccdc号即可查看cif结构
+    </div>
+""", unsafe_allow_html=True)
