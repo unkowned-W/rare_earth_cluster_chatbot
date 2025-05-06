@@ -1,5 +1,5 @@
 import streamlit as st
-from assistant import get_assistant_response, render_mixed_content
+from assistant import get_assistant_response, render_mixed_content, initial_client
 
 st.set_page_config(page_title="Rear_Earth_Cluster Chatbot", page_icon="💬")
 '''稀土团簇合成数据机器人'''
@@ -33,11 +33,11 @@ if not openai_api_key:
     st.info("Please add your OpenAI API key to continue.", icon="🗝️")
 else:
     client = OpenAI(api_key=openai_api_key)
+    initial_client(client)
     
     if "messages" not in st.session_state:
           st.session_state.messages = [{"role": "assistant", "content": "你好！我是稀土团簇合成小助手！"}]
     st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
-    
     
     for message in st.session_state.messages:
         role_class = "user" if message["role"] == "user" else "assistant"
@@ -63,7 +63,7 @@ else:
         """, unsafe_allow_html=True)
         
         try:
-            content = get_assistant_response(user_input)
+            content = get_assistant_response(user_input, client)
             render_mixed_content(content) #格式化输出
             st.session_state.messages.append({"role": "assistant", "content": content})  
         except Exception as e:
