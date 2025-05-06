@@ -28,51 +28,49 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
-# 聊天记录（会话状态）
-if "messages" not in st.session_state:
-      st.session_state.messages = [{"role": "assistant", "content": "你好！我是稀土团簇合成小助手！"}]
-st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
-
-# 显示聊天记录
-for message in st.session_state.messages:
-    role_class = "user" if message["role"] == "user" else "assistant"
-    st.markdown(f"""
-        <div class='chat-bubble {role_class}'>
-            {message["content"]}
-        </div>
-    """, unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
-
-# 用户输入框和发送按钮
-with st.form("chat_form_1", clear_on_submit=True):
-    user_input = st.text_input("请输入消息：", key="user_input_1")
-    submit_button_1 = st.form_submit_button("发送")
-if submit_button_1 and user_input:
-    # 记录用户消息
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    # 显示用户消息
-    st.markdown(f"""
-        <div class='chat-bubble user'>
-            {user_input}
-        </div>
-    """, unsafe_allow_html=True)
+openai_api_key = st.text_input("OpenAI API Key", type="password")
+if not openai_api_key:
+    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+else:
+    client = OpenAI(api_key=openai_api_key)
     
-    try:
-        content = get_assistant_response(user_input)
-        #content = response.choices[0].message.content
-        #st.markdown(f"""
-            #<div class='chat-bubble assistant' style="font-size: 16px; padding: 10px; border-radius: 10px; background-color: #f0f2f6;">
-                #{content}
-            #</div>
-        #""", unsafe_allow_html=True)
-        render_mixed_content(content) #格式化输出
-        st.session_state.messages.append({"role": "assistant", "content": content})  
-    except Exception as e:
-        st.error(f"发生错误: {e}")
-
-    st.markdown(f"""
-    <div class='chat-bubble assistant' style="font-size: 16px; padding: 10px; border-radius: 10px; background-color: #f0f2f6;">
-        输入要查看结构的ccdc号即可查看cif结构
-    </div>
-""", unsafe_allow_html=True)
+    if "messages" not in st.session_state:
+          st.session_state.messages = [{"role": "assistant", "content": "你好！我是稀土团簇合成小助手！"}]
+    st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
+    
+    
+    for message in st.session_state.messages:
+        role_class = "user" if message["role"] == "user" else "assistant"
+        st.markdown(f"""
+            <div class='chat-bubble {role_class}'>
+                {message["content"]}
+            </div>
+        """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # 用户输入框和发送按钮
+    with st.form("chat_form_1", clear_on_submit=True):
+        user_input = st.text_input("请输入消息：", key="user_input_1")
+        submit_button_1 = st.form_submit_button("发送")
+    if submit_button_1 and user_input:
+        # 记录用户消息
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        # 显示用户消息
+        st.markdown(f"""
+            <div class='chat-bubble user'>
+                {user_input}
+            </div>
+        """, unsafe_allow_html=True)
+        
+        try:
+            content = get_assistant_response(user_input)
+            render_mixed_content(content) #格式化输出
+            st.session_state.messages.append({"role": "assistant", "content": content})  
+        except Exception as e:
+            st.error(f"发生错误: {e}")
+    
+        st.markdown(f"""
+        <div class='chat-bubble assistant' style="font-size: 16px; padding: 10px; border-radius: 10px; background-color: #f0f2f6;">
+            输入要查看结构的ccdc号即可查看cif结构
+        </div>
+    """, unsafe_allow_html=True)
