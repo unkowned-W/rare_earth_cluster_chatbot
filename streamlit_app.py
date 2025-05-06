@@ -1,5 +1,5 @@
 import streamlit as st
-from assistant import get_assistant_response, render_mixed_content, initial_client
+from assistant import get_assistant_response, render_mixed_content
 
 st.set_page_config(page_title="Rear_Earth_Cluster Chatbot", page_icon="💬")
 '''稀土团簇合成数据机器人'''
