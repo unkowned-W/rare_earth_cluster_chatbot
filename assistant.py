@@ -6,27 +6,23 @@ import os
 import datetime
 import re
 
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-base_url = os.getenv("OPENAI_API_BASE_URL")
-client = OpenAI(api_key=api_key, base_url=base_url)
-
-file = client.files.create(
-    file=open("final_data.json", "rb"),
-    purpose='assistants'
-)
-vector_store = client.vector_stores.create(file_ids=[file.id], name='cluster-database')
-message_history = []  
-MAX_CONTEXT_MESSAGES = 5
-assistant = client.beta.assistants.create(
-    instructions="""A jsonl file summarizing many rare earth clusters is given to you.
-    The jsonl file includes the title and DOI of the document recording the clusters,
-    the formula of the clusters, the synthesis process, and their CCDC numbers (optional).
-    Please answer the user's questions based on the jsonl file, do not need return the file name in the end.""",
-    model="gpt-4o",
-    tools=[{"type": 'file_search'}],
-    tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}}
-)
+def initial_client(client):
+    file = client.files.create(
+        file=open("final_data.json", "rb"),
+        purpose='assistants'
+    )
+    vector_store = client.vector_stores.create(file_ids=[file.id], name='cluster-database')
+    message_history = []  
+    MAX_CONTEXT_MESSAGES = 5
+    assistant = client.beta.assistants.create(
+        instructions="""A jsonl file summarizing many rare earth clusters is given to you.
+        The jsonl file includes the title and DOI of the document recording the clusters,
+        the formula of the clusters, the synthesis process, and their CCDC numbers (optional).
+        Please answer the user's questions based on the jsonl file, do not need return the file name in the end.""",
+        model="gpt-4o",
+        tools=[{"type": 'file_search'}],
+        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}}
+    )
 
 def write_log(txt):
     try:
@@ -51,7 +47,7 @@ def write_log(txt):
     except Exception as e:
         print(f"无法写入日志文件: {str(e)}")
 
-def get_assistant_response(prompt):
+def get_assistant_response(prompt, client):
     messages = []
     for msg in message_history[-MAX_CONTEXT_MESSAGES:]:
             messages.append(msg)
