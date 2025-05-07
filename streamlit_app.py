@@ -62,9 +62,3 @@ if submit_button_1 and user_input:
         st.session_state.messages.append({"role": "assistant", "content": content})  
     except Exception as e:
         st.error(f"发生错误: {e}")
-    
-    st.markdown(f"""
-        <div class='chat-bubble assistant' style="font-size: 16px; padding: 10px; border-radius: 10px; background-color: #f0f2f6;">
-            输入要查看结构的ccdc号即可查看cif结构
-        </div>
-    """, unsafe_allow_html=True)
