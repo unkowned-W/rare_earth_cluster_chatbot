@@ -52,6 +52,7 @@ def write_log(txt):
         print(f"无法写入日志文件: {str(e)}")
 
 def get_assistant_response(prompt):
+    global client
     messages = []
     for msg in message_history[-MAX_CONTEXT_MESSAGES:]:
             messages.append(msg)
