@@ -6,7 +6,7 @@ import datetime
 import re
 
 api_key = st.secrets["OPENAI_API_KEY"]
-base_url = st.secrets("OPENAI_BASE_URL")
+base_url = st.secrets["OPENAI_BASE_URL"]
 client = OpenAI(api_key=api_key, base_url=base_url)
 
 file = client.files.create(
