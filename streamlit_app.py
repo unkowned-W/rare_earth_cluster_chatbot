@@ -57,7 +57,7 @@ if submit_button_1 and user_input:
     """, unsafe_allow_html=True)
         
     try:
-        content = get_assistant_response(user_input, client)
+        content = get_assistant_response(user_input)
         render_mixed_content(content) #格式化输出
         st.session_state.messages.append({"role": "assistant", "content": content})  
     except Exception as e:
