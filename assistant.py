@@ -1,14 +1,12 @@
 from openai import OpenAI
-from dotenv import load_dotenv
 from time import sleep
 import streamlit as st
 import os
 import datetime
 import re
 
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-base_url = os.getenv("OPENAI_BASE_URL")
+api_key = st.secrets["OPENAI_API_KEY"]
+base_url = st.secrets("OPENAI_BASE_URL")
 client = OpenAI(api_key=api_key, base_url=base_url)
 
 file = client.files.create(
