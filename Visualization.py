@@ -3,7 +3,7 @@ from pymatgen.core import Structure
 import py3Dmol
 from pydantic import BaseModel, Field
 from typing import Optional
-import tempfile
+import tempfile, os
 
 class VisualizeCIF(BaseModel):
     cif_path: Optional[str] = Field(None, description="Path to the CIF file")
