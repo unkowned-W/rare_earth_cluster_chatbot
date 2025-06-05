@@ -1,6 +1,6 @@
 import streamlit as st
 from assistant import get_assistant_response, render_mixed_content
-
+from Visualization import VisualizeCIF
 st.set_page_config(page_title="Rare_Earth_Cluster Chatbot", page_icon="💬")
 '''稀土团簇合成数据机器人'''
 st.markdown("""
@@ -62,3 +62,15 @@ if submit_button_1 and user_input:
         st.session_state.messages.append({"role": "assistant", "content": content})  
     except Exception as e:
         st.error(f"发生错误: {e}")
+
+st.markdown("上传 CIF 文件，查看晶体结构的 3D 模型")
+uploaded_file = st.file_uploader("选择 CIF 文件", type=["cif"], key="file_uploader")
+if uploaded_file:
+    cif_data = uploaded_file.getvalue().decode("utf-8")
+    st.success(f"已上传文件: {uploaded_file.name}")
+    with st.expander("查看 CIF 文件内容"):
+        st.code(cif_data)
+    if st.button("开始可视化"):
+        visualizer = VisualizeCIF(cif_data=cif_data)
+        with st.spinner("生成 3D 模型中..."):
+            visualizer.run()
