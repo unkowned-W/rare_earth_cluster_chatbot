@@ -4,7 +4,7 @@ import py3Dmol
 from pydantic import BaseModel, Field
 from typing import Optional
 import tempfile, os
-from colors import ELEMENT_COLORS
+from Colors import ELEMENT_COLORS
 
 def render_legend(elements):
     legend_html = "<b>原子颜色图例：</b><br>"
