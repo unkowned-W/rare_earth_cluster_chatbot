@@ -1,3 +1,6 @@
 streamlit
 openai
 python_dotenv
+pydantic
+py3Dmol
+pymatgen
